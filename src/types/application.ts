@@ -14,7 +14,7 @@ export type ResumeOption = { id: string; name: string; version: number };
 export type ApplicationDetailItem = Prisma.ApplicationGetPayload<{
   include: {
     applicationResumes: {
-      include: { resume: { select: { id: true; name: true; version: true; fileType: true } } };
+      include: { resume: { select: { id: true; name: true; version: true; fileType: true; fileURL: true } } };
     };
     notes: true;
     applicationContacts: { include: { contact: true } };

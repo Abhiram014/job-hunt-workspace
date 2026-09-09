@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import { MobileNav } from "./mobile-nav";
 
 function initials(name?: string | null, email?: string | null) {
   const source = name?.trim() || email || "?";
@@ -33,6 +34,7 @@ export function Topbar({
 
   return (
     <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+      <MobileNav />
       <div className="relative w-full max-w-md">
         <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input

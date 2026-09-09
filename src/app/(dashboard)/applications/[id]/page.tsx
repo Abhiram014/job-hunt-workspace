@@ -16,7 +16,7 @@ export default async function ApplicationDetailPage({
     include: {
       applicationResumes: {
         orderBy: { submittedAt: "desc" },
-        include: { resume: { select: { id: true, name: true, version: true, fileType: true } } },
+        include: { resume: { select: { id: true, name: true, version: true, fileType: true, fileURL: true } } },
       },
       notes: { orderBy: [{ pinned: "desc" }, { createdAt: "desc" }] },
       applicationContacts: {

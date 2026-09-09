@@ -92,7 +92,7 @@ export function ResumePanel({
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                {ar.resume.fileType && (
+                {ar.resume.fileURL && (
                   <>
                     <Button variant="ghost" size="icon" className="h-7 w-7" asChild title="Preview">
                       <a href={`/api/resumes/${ar.resume.id}/file`} target="_blank" rel="noopener noreferrer">

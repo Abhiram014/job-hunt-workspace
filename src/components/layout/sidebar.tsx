@@ -3,28 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import {
-  LayoutDashboard,
-  Briefcase,
-  FileText,
-  Sparkles,
-  Users,
-  BarChart3,
-  Settings,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
+import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/applications", label: "Applications", icon: Briefcase },
-  { href: "/resumes", label: "Resumes", icon: FileText },
-  { href: "/ai", label: "AI Workspace", icon: Sparkles },
-  { href: "/contacts", label: "Contacts", icon: Users },
-  { href: "/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
+import { NAV_ITEMS } from "./nav-items";
 
 const STORAGE_KEY = "jhw-sidebar-collapsed";
 
