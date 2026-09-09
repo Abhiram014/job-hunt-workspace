@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Sparkles } from "lucide-react";
 import {
@@ -16,6 +15,7 @@ import { NotesPanel } from "./notes-panel";
 import { ResumePanel } from "./resume-panel";
 import { ContactsPanel } from "./contacts-panel";
 import { InterviewsPanel } from "./interviews-panel";
+import { AiWorkspace } from "@/components/ai/ai-workspace";
 import {
   JOB_SOURCE_LABELS,
   WORK_MODE_LABELS,
@@ -26,15 +26,18 @@ import type {
   BaseResumeOption,
   ContactOption,
 } from "@/types/application";
+import type { ConversationListItem } from "@/types/ai";
 
 export function ApplicationDetail({
   application,
   resumes,
   allContacts,
+  conversations,
 }: {
   application: ApplicationDetailItem;
   resumes: BaseResumeOption[];
   allContacts: ContactOption[];
+  conversations: ConversationListItem[];
 }) {
   return (
     <div className="space-y-6">
@@ -122,19 +125,28 @@ export function ApplicationDetail({
         </TabsContent>
 
         <TabsContent value="ai">
-          <Card>
-            <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
-              <Sparkles className="h-8 w-8 text-muted-foreground" />
-              <div>
-                <p className="font-medium">AI Workspace is coming in Phase 2</p>
-                <p className="max-w-md text-sm text-muted-foreground">
-                  Resume match analysis, tailoring, and job-specific chat for this application will appear here
-                  once the AI features are wired up. Track progress on the{" "}
-                  <Link href="/ai" className="underline underline-offset-2">AI Workspace page</Link>.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <AiWorkspace
+            fixedApplicationId={application.id}
+            initialResumeId={application.applicationResumes[0]?.resumeId}
+            applications={[
+              {
+                id: application.id,
+                company: application.company,
+                jobTitle: application.jobTitle,
+                jobDescription: application.jobDescription,
+              },
+            ]}
+            resumes={resumes
+              .filter((r) => r.extractedText)
+              .map((r) => ({
+                id: r.id,
+                name: r.name,
+                version: r.version,
+                extractedText: r.extractedText,
+                isBaseResume: r.isBaseResume,
+              }))}
+            conversations={conversations}
+          />
         </TabsContent>
 
         <TabsContent value="activity">

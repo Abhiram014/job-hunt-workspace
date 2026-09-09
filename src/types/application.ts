@@ -29,6 +29,7 @@ export type BaseResumeOption = {
   name: string;
   version: number;
   isBaseResume: boolean;
+  extractedText: string | null;
 };
 
 export type ContactOption = {
