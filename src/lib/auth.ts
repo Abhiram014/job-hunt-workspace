@@ -5,6 +5,9 @@ import { prisma } from "@/lib/db";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
+  // Vercel's preview/production URL isn't known until deploy; trust the
+  // Host header instead of requiring NEXTAUTH_URL to be pinned in advance.
+  trustHost: true,
   pages: {
     signIn: "/login",
   },

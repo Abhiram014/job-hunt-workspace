@@ -1,7 +1,23 @@
 import { NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { registerSchema } from "@/lib/validation/auth";
+
+// When SIGNUP_INVITE_CODE is set (recommended once this app is deployed
+// somewhere reachable by strangers), registration requires it — otherwise
+// anyone who finds the URL can create an account and start using the AI
+// features on the deployer's Anthropic API key. Unset in local dev.
+function isValidInviteCode(provided: string | undefined): boolean {
+  const required = process.env.SIGNUP_INVITE_CODE;
+  if (!required) return true;
+  if (!provided) return false;
+
+  const a = Buffer.from(provided);
+  const b = Buffer.from(required);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -14,7 +30,14 @@ export async function POST(req: Request) {
     );
   }
 
-  const { name, email, password } = parsed.data;
+  const { name, email, password, inviteCode } = parsed.data;
+
+  if (!isValidInviteCode(inviteCode)) {
+    return NextResponse.json(
+      { error: "Invalid or missing invite code" },
+      { status: 403 }
+    );
+  }
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {

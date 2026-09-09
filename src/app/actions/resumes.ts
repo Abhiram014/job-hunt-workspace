@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
 import { logActivity } from "@/lib/services/activity-service";
-import { storageProvider } from "@/lib/storage/local-provider";
+import { storageProvider } from "@/lib/storage";
 import { extractResumeText } from "@/lib/services/resume-text";
 import {
   resumeUpdateSchema,
