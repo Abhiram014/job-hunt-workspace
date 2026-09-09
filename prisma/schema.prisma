@@ -1,0 +1,417 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Auth ----------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  passwordHash  String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  applications  Application[]
+  resumes       Resume[]
+  notes         Note[]
+  contacts      Contact[]
+  interviews    Interview[]
+  conversations Conversation[]
+  followups     Followup[]
+  activityEvents ActivityEvent[]
+  jobImports    JobImport[]
+}
+
+// ---------- Applications ----------
+
+enum ApplicationStatus {
+  SAVED
+  PREPARING
+  APPLIED
+  ONLINE_ASSESSMENT
+  RECRUITER_SCREEN
+  TECHNICAL_INTERVIEW
+  HIRING_MANAGER_INTERVIEW
+  ONSITE_FINAL_ROUND
+  OFFER
+  REJECTED
+  WITHDRAWN
+}
+
+enum WorkMode {
+  ONSITE
+  HYBRID
+  REMOTE
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  INTERNSHIP
+  CONTRACT
+  TEMPORARY
+}
+
+enum JobSource {
+  LINKEDIN
+  GREENHOUSE
+  LEVER
+  ASHBY
+  WORKDAY
+  INDEED
+  COMPANY_SITE
+  REFERRAL
+  MANUAL
+  OTHER
+}
+
+model Application {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  company         String
+  companyLogo     String?
+  jobTitle        String
+  jobURL          String?
+  jobPostingID    String?
+  location        String?
+  workMode        WorkMode?
+  employmentType  EmploymentType?
+
+  salaryMin       Int?
+  salaryMax       Int?
+  salaryCurrency  String?
+
+  jobDescription  String?
+  requirements    String?  // newline-delimited; kept as text for MVP simplicity
+  preferredQualifications String?
+  skills          String?  // comma-delimited tags
+
+  dateFound       DateTime?
+  dateApplied     DateTime?
+  deadline        DateTime?
+  applicationStatus ApplicationStatus @default(SAVED)
+  source          JobSource @default(MANUAL)
+
+  roleCategory    String?  // used for "applications by role category" analytics
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  applicationResumes ApplicationResume[]
+  notes           Note[]
+  applicationContacts ApplicationContact[]
+  interviews      Interview[]
+  conversations   Conversation[]
+  followups       Followup[]
+  activityEvents  ActivityEvent[]
+
+  @@index([userId])
+  @@index([userId, applicationStatus])
+  @@index([userId, company])
+  @@index([userId, createdAt])
+}
+
+// ---------- Resumes ----------
+
+model Resume {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name           String
+  fileURL        String?
+  fileType       String?  // pdf | docx | txt
+  extractedText  String?
+
+  version        Int      @default(1)
+  parentResumeId String?
+  parentResume   Resume?  @relation("ResumeVersions", fields: [parentResumeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  versions       Resume[] @relation("ResumeVersions")
+
+  tags           String?  // comma-delimited
+  isBaseResume   Boolean  @default(false)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  applicationResumes ApplicationResume[]
+  conversations  Conversation[]
+
+  @@index([userId])
+  @@index([userId, isBaseResume])
+}
+
+// Immutable join: which exact resume version was submitted to which application.
+// Never overwritten once set (a new submission creates a new row, old ones retained for history).
+model ApplicationResume {
+  id            String   @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  resumeId      String
+  resume        Resume   @relation(fields: [resumeId], references: [id], onDelete: Restrict)
+
+  isSubmitted   Boolean  @default(true)
+  submittedAt   DateTime @default(now())
+
+  @@index([applicationId])
+  @@index([resumeId])
+}
+
+// ---------- Notes ----------
+
+enum NoteCategory {
+  GENERAL
+  REFERRAL
+  RECRUITER
+  INTERVIEW
+  FOLLOW_UP
+  RESEARCH
+}
+
+model Note {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  content       String
+  category      NoteCategory @default(GENERAL)
+  pinned        Boolean  @default(false)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([applicationId])
+}
+
+// ---------- Contacts / CRM ----------
+
+enum ContactType {
+  RECRUITER
+  HIRING_MANAGER
+  REFERRAL
+  EMPLOYEE
+  ALUMNI
+  FRIEND
+  OTHER
+}
+
+model Contact {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name           String
+  company        String?
+  jobTitle       String?
+  linkedinURL    String?
+  email          String?
+  relationship   String?
+  contactType    ContactType @default(OTHER)
+  notes          String?
+
+  lastContactedAt DateTime?
+  followUpDate   DateTime?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  applicationContacts ApplicationContact[]
+  followups      Followup[]
+
+  @@index([userId])
+}
+
+model ApplicationContact {
+  id            String   @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  contactId     String
+  contact       Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime @default(now())
+
+  @@unique([applicationId, contactId])
+  @@index([applicationId])
+  @@index([contactId])
+}
+
+// ---------- Interviews ----------
+
+enum InterviewStage {
+  RECRUITER_SCREEN
+  TECHNICAL_SCREEN
+  CODING_ASSESSMENT
+  HIRING_MANAGER
+  BEHAVIORAL
+  SYSTEM_DESIGN
+  ONSITE
+  FINAL_ROUND
+  OTHER
+}
+
+enum InterviewResult {
+  PENDING
+  PASSED
+  FAILED
+  CANCELLED
+  NO_SHOW
+}
+
+model Interview {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId  String
+  application    Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  stage          InterviewStage @default(OTHER)
+  scheduledAt    DateTime?
+  interviewer    String?
+  meetingURL     String?
+  notes          String?
+  questionsAsked String?
+  myAnswers      String?
+  followUpRequired Boolean @default(false)
+  result         InterviewResult @default(PENDING)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([applicationId])
+}
+
+// ---------- AI Chat ----------
+
+model Conversation {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  resumeId      String?
+  resume        Resume?  @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+
+  title         String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  messages      Message[]
+
+  @@index([userId])
+  @@index([applicationId])
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  role           MessageRole
+  content        String
+
+  createdAt      DateTime @default(now())
+
+  @@index([conversationId])
+}
+
+// ---------- Follow-ups ----------
+
+model Followup {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  contactId     String?
+  contact       Contact? @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  title         String
+  dueDate       DateTime
+  completed     Boolean  @default(false)
+  completedAt   DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId, dueDate])
+  @@index([applicationId])
+}
+
+// ---------- Activity timeline ----------
+
+enum ActivityType {
+  JOB_SAVED
+  APPLICATION_SUBMITTED
+  STATUS_CHANGED
+  RESUME_TAILORED
+  RESUME_SUBMITTED
+  CONTACT_ADDED
+  REFERRAL_REQUESTED
+  INTERVIEW_SCHEDULED
+  NOTE_CREATED
+  OFFER_RECEIVED
+  OTHER
+}
+
+model ActivityEvent {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  type          ActivityType
+  description   String
+
+  createdAt     DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([applicationId])
+}
+
+// ---------- Job import (URL scrape / extension drafts) ----------
+
+enum JobImportStatus {
+  PENDING
+  EXTRACTED
+  FAILED
+  PROMOTED
+}
+
+model JobImport {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sourceURL     String?
+  rawHTML       String?
+  rawText       String?
+  extractedJSON String?  // JSON blob of extractor output, reviewed before promotion
+  extractorUsed String?  // greenhouse | lever | ashby | generic | paste
+  status        JobImportStatus @default(PENDING)
+  errorMessage  String?
+
+  promotedApplicationId String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+}
