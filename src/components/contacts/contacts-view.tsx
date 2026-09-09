@@ -57,7 +57,7 @@ export function ContactsView({ contacts }: { contacts: ContactListItem[] }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">Contacts</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Contacts</h1>
           <p className="text-sm text-muted-foreground">
             {contacts.length} contact{contacts.length === 1 ? "" : "s"} — recruiters, referrals, and more
           </p>

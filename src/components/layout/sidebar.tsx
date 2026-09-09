@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "./nav-items";
 
@@ -44,23 +44,23 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "hidden md:flex h-screen sticky top-0 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground transition-[width] duration-200",
+        "hidden md:flex h-screen sticky top-0 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200",
         collapsed ? "w-16" : "w-60",
         !mounted && "duration-0"
       )}
     >
-      <div className="flex h-14 items-center gap-2 border-b px-3">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-semibold">
-          JH
+      <div className="flex h-14 items-center gap-2.5 px-4">
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <Briefcase className="h-3.5 w-3.5" strokeWidth={2.25} />
         </div>
         {!collapsed && (
-          <span className="truncate text-sm font-semibold">
+          <span className="truncate text-sm font-semibold tracking-tight">
             Job Hunt Workspace
           </span>
         )}
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto p-2">
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-2.5 pt-1">
         {NAV_ITEMS.map((item) => {
           const active =
             pathname === item.href || pathname.startsWith(item.href + "/");
@@ -71,29 +71,29 @@ export function Sidebar() {
               href={item.href}
               title={collapsed ? item.label : undefined}
               className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-sm font-medium transition-colors",
                 active
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground/65 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
               )}
             >
-              <Icon className="h-4 w-4 shrink-0" />
+              <Icon className="h-[15px] w-[15px] shrink-0" strokeWidth={2} />
               {!collapsed && <span className="truncate">{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      <div className="border-t p-2">
+      <div className="p-2.5">
         <button
           onClick={toggle}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-sm text-sidebar-foreground/55 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
         >
           {collapsed ? (
-            <ChevronsRight className="h-4 w-4" />
+            <ChevronsRight className="h-[15px] w-[15px]" strokeWidth={2} />
           ) : (
             <>
-              <ChevronsLeft className="h-4 w-4" />
+              <ChevronsLeft className="h-[15px] w-[15px]" strokeWidth={2} />
               <span>Collapse</span>
             </>
           )}

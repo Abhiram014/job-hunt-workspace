@@ -57,7 +57,7 @@ export default async function SearchPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Search results for &quot;{query}&quot;</h1>
+      <h1 className="text-xl font-semibold tracking-tight">Search results for &quot;{query}&quot;</h1>
 
       {noResults && <p className="text-sm text-muted-foreground">No matches found.</p>}
 

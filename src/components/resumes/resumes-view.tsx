@@ -41,7 +41,7 @@ export function ResumesView({ resumes }: { resumes: ResumeListItem[] }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">Resumes</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Resumes</h1>
           <p className="text-sm text-muted-foreground">
             {resumes.length} resume{resumes.length === 1 ? "" : "s"} in your library
           </p>

@@ -157,7 +157,7 @@ export default function NewApplicationPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <div>
-        <h1 className="text-xl font-semibold">New Application</h1>
+        <h1 className="text-xl font-semibold tracking-tight">New Application</h1>
         <p className="text-sm text-muted-foreground">
           Import from a job posting URL, paste a job description, or enter details manually.
         </p>

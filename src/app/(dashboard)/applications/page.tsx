@@ -30,7 +30,7 @@ export default async function ApplicationsPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">Applications</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Applications</h1>
           <p className="text-sm text-muted-foreground">
             {applications.length} tracked application{applications.length === 1 ? "" : "s"}
           </p>

@@ -33,13 +33,13 @@ export function Topbar({
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+    <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <MobileNav />
-      <div className="relative w-full max-w-md">
-        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="relative w-full max-w-sm">
+        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search companies, roles, notes, resumes..."
-          className="pl-8"
+          className="h-8 border-transparent bg-muted pl-8 text-sm shadow-none placeholder:text-muted-foreground/80 focus-visible:border-ring focus-visible:bg-background"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               const q = (e.target as HTMLInputElement).value;
@@ -52,9 +52,9 @@ export function Topbar({
       <div className="ml-auto flex items-center gap-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-full">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="text-xs">
+            <button className="flex items-center gap-2 rounded-full transition-opacity hover:opacity-80">
+              <Avatar className="h-7 w-7">
+                <AvatarFallback className="bg-primary text-[11px] font-medium text-primary-foreground">
                   {initials(user.name, user.email)}
                 </AvatarFallback>
               </Avatar>

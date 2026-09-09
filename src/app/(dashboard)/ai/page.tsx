@@ -20,7 +20,7 @@ export default function AiWorkspacePage() {
           <Sparkles className="h-5 w-5" />
         </div>
         <div>
-          <h1 className="text-xl font-semibold">AI Workspace</h1>
+          <h1 className="text-xl font-semibold tracking-tight">AI Workspace</h1>
           <p className="text-sm text-muted-foreground">Phase 2 — not yet available</p>
         </div>
       </div>

@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
@@ -16,31 +15,22 @@ export function KpiCard({
   suffix?: string;
 }) {
   const accentClasses: Record<string, string> = {
-    default: "bg-primary/10 text-primary",
-    warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-    success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-    danger: "bg-red-500/10 text-red-600 dark:text-red-400",
+    default: "text-muted-foreground",
+    warning: "text-amber-600 dark:text-amber-400",
+    success: "text-emerald-600 dark:text-emerald-400",
+    danger: "text-red-600 dark:text-red-400",
   };
 
   return (
-    <Card>
-      <CardContent className="flex items-center gap-4 py-2">
-        <div
-          className={cn(
-            "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-            accentClasses[accent ?? "default"]
-          )}
-        >
-          <Icon className="h-5 w-5" />
-        </div>
-        <div className="min-w-0">
-          <p className="text-2xl font-semibold tabular-nums leading-tight">
-            {value}
-            {suffix && <span className="text-sm font-normal text-muted-foreground ml-1">{suffix}</span>}
-          </p>
-          <p className="truncate text-xs text-muted-foreground">{label}</p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="rounded-xl border bg-card px-4 py-3.5 shadow-sm">
+      <div className="flex items-center gap-1.5 text-muted-foreground">
+        <Icon className={cn("h-3.5 w-3.5", accentClasses[accent ?? "default"])} />
+        <p className="truncate text-xs font-medium">{label}</p>
+      </div>
+      <p className="mt-1.5 text-2xl font-semibold tabular-nums leading-none tracking-tight">
+        {value}
+        {suffix && <span className="ml-1 text-sm font-normal text-muted-foreground">{suffix}</span>}
+      </p>
+    </div>
   );
 }

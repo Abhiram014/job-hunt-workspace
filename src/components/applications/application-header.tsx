@@ -99,7 +99,7 @@ export function ApplicationHeader({ application }: { application: ApplicationDet
             {application.company.slice(0, 1).toUpperCase()}
           </div>
           <div>
-            <h1 className="text-xl font-semibold leading-tight">{application.jobTitle}</h1>
+            <h1 className="text-xl font-semibold tracking-tight leading-tight">{application.jobTitle}</h1>
             <p className="text-muted-foreground">{application.company}</p>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
               {application.location && <span>{application.location}</span>}
