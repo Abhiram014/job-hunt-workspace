@@ -1,5 +1,12 @@
-import { auth } from "@/lib/auth";
+import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
+import { authConfig } from "@/lib/auth.config";
+
+// Uses the edge-safe base config directly (no Prisma/bcrypt) since
+// middleware runs on Vercel's Edge runtime with a strict bundle size limit.
+// This only checks for a valid session JWT — actual credential
+// verification happens in the Node.js runtime via lib/auth.ts.
+const { auth } = NextAuth(authConfig);
 
 const PUBLIC_PATHS = ["/login", "/register"];
 
