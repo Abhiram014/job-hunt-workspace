@@ -7,6 +7,8 @@ import { extractFromJsonLd } from "./json-ld";
 // read without executing JS. Falls back to JSON-LD / generic meta tags when
 // that shape isn't found (Ashby's internal API is not stable/public).
 export class AshbyExtractor implements JobExtractor {
+  name = "AshbyExtractor";
+
   matches(url: URL): boolean {
     return url.hostname.includes("ashbyhq.com");
   }

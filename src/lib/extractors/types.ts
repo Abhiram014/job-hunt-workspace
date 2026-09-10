@@ -18,6 +18,8 @@ export interface ExtractedJob {
 }
 
 export interface JobExtractor {
+  /** Stable identifier — don't rely on constructor.name, which minifiers rename in production. */
+  name: string;
   /** Returns true if this extractor knows how to handle the given URL. */
   matches(url: URL): boolean;
   /** Parses raw HTML (and the source URL) into structured job fields. */

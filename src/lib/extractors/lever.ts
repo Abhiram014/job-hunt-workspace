@@ -3,6 +3,8 @@ import type { JobExtractor, ExtractedJob } from "./types";
 import { extractFromJsonLd } from "./json-ld";
 
 export class LeverExtractor implements JobExtractor {
+  name = "LeverExtractor";
+
   matches(url: URL): boolean {
     return url.hostname.includes("lever.co");
   }

@@ -3,6 +3,8 @@ import type { JobExtractor, ExtractedJob } from "./types";
 import { extractFromJsonLd } from "./json-ld";
 
 export class GreenhouseExtractor implements JobExtractor {
+  name = "GreenhouseExtractor";
+
   matches(url: URL): boolean {
     return (
       url.hostname.includes("greenhouse.io") ||

@@ -20,6 +20,18 @@ export interface ImportResult {
   extractedJob: ExtractedJob;
   extractorUsed: string;
   rawHTML: string;
+  /** True when the extraction found little to nothing job-specific — e.g. a
+   * client-rendered SPA where only company-wide page metadata was available
+   * server-side. The caller should ask the user to review extra carefully
+   * or fall back to pasting the description. */
+  lowConfidence: boolean;
+}
+
+function isLowConfidence(job: ExtractedJob): boolean {
+  if (!job.jobDescription) return true;
+  if (job.jobDescription.length < 80) return true;
+  if (job.jobTitle && job.jobDescription === job.jobTitle) return true;
+  return false;
 }
 
 export async function importJobFromUrl(rawUrl: string): Promise<ImportResult> {
@@ -65,7 +77,8 @@ export async function importJobFromUrl(rawUrl: string): Promise<ImportResult> {
 
   return {
     extractedJob,
-    extractorUsed: extractor.constructor.name,
+    extractorUsed: extractor.name,
     rawHTML: html.slice(0, 500_000), // cap stored HTML size
+    lowConfidence: isLowConfidence(extractedJob),
   };
 }

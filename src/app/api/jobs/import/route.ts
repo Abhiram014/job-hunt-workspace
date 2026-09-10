@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
   if (url) {
     try {
-      const { extractedJob, extractorUsed, rawHTML } = await importJobFromUrl(url);
+      const { extractedJob, extractorUsed, rawHTML, lowConfidence } = await importJobFromUrl(url);
       const jobImport = await prisma.jobImport.create({
         data: {
           userId,
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
           status: "EXTRACTED",
         },
       });
-      return NextResponse.json({ jobImport, extractedJob });
+      return NextResponse.json({ jobImport, extractedJob, lowConfidence });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to import job";
       const jobImport = await prisma.jobImport.create({

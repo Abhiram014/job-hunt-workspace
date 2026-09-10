@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Link2, ClipboardPaste, PencilLine, Loader2 } from "lucide-react";
+import { Link2, ClipboardPaste, PencilLine, Loader2, AlertTriangle } from "lucide-react";
 import {
   Tabs,
   TabsContent,
@@ -51,6 +51,7 @@ export default function NewApplicationPage() {
     values: ApplicationFormValues;
     jobURL: string;
     source: "GREENHOUSE" | "LEVER" | "ASHBY" | "OTHER";
+    lowConfidence: boolean;
   } | null>(null);
 
   // Paste JD state
@@ -79,8 +80,13 @@ export default function NewApplicationPage() {
         values: extractedToFormValues(data.extractedJob),
         jobURL: url.trim(),
         source: ["GREENHOUSE", "LEVER", "ASHBY"].includes(source) ? source : "OTHER",
+        lowConfidence: Boolean(data.lowConfidence),
       });
-      toast.success("Extracted job details — review and edit before saving.");
+      if (data.lowConfidence) {
+        toast.warning("This page didn't yield much usable content — likely a JavaScript-rendered site. Fill in the gaps below, or switch to \"Paste Description\".");
+      } else {
+        toast.success("Extracted job details — review and edit before saving.");
+      }
     } catch {
       toast.error("Couldn't reach the job posting page.");
     } finally {
@@ -175,8 +181,9 @@ export default function NewApplicationPage() {
             <CardHeader>
               <CardTitle className="text-sm">Paste a job posting URL</CardTitle>
               <CardDescription>
-                Works best with Greenhouse, Lever, and Ashby postings. Other sites (LinkedIn, Workday, Indeed) often
-                render with JavaScript and may only yield partial results — review carefully before saving.
+                Works best with Greenhouse, Lever, and Ashby postings. Many other sites (LinkedIn, Workday, Indeed,
+                and JavaScript-rendered boards like Gem) can only yield partial results or none at all — you&apos;ll
+                get a clear warning when that happens, so you can fill in the gaps or paste the description instead.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex gap-2">
@@ -198,7 +205,18 @@ export default function NewApplicationPage() {
                 <CardTitle className="text-sm">Review extracted details</CardTitle>
                 <CardDescription>Edit anything that looks wrong before saving.</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                {urlImport.lowConfidence && (
+                  <div className="flex gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <p>
+                      This page likely renders its content with JavaScript, so almost nothing could be pulled from it
+                      server-side — the fields below are probably incomplete or wrong. Fill them in manually, or go
+                      back and use the <strong>Paste Description</strong> tab instead if you can copy the job text
+                      from the page.
+                    </p>
+                  </div>
+                )}
                 <ApplicationForm
                   initialValues={urlImport.values}
                   submitLabel="Save Application"
