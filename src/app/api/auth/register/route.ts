@@ -8,12 +8,20 @@ import { registerSchema } from "@/lib/validation/auth";
 // somewhere reachable by strangers), registration requires it — otherwise
 // anyone who finds the URL can create an account and start using the AI
 // features on the deployer's Anthropic API key. Unset in local dev.
+function stripBom(value: string): string {
+  return value.charCodeAt(0) === 0xfeff ? value.slice(1) : value;
+}
+
 function isValidInviteCode(provided: string | undefined): boolean {
-  const required = process.env.SIGNUP_INVITE_CODE;
+  // Vercel's CLI (env add via piped stdin, on Windows at least) has been
+  // observed to prepend a UTF-8 BOM to the stored value regardless of how
+  // clean the input stream is — stripping it here is more reliable than
+  // fighting that upstream, and is a harmless no-op for a clean value.
+  const required = process.env.SIGNUP_INVITE_CODE ? stripBom(process.env.SIGNUP_INVITE_CODE) : "";
   if (!required) return true;
   if (!provided) return false;
 
-  const a = Buffer.from(provided);
+  const a = Buffer.from(stripBom(provided));
   const b = Buffer.from(required);
   if (a.length !== b.length) return false;
   return timingSafeEqual(a, b);
